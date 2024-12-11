@@ -1,0 +1,25 @@
+def pebble(arr, time):
+    # go to next stage
+    for j in range(time):
+        length = len(arr)
+        i = 0
+        while i < length:
+            if arr[i] == 0:
+                arr[i] = 1
+            elif arr[i] % 2 == 0:
+                numberString = str(arr[i])
+                mid = len(numberString) // 2
+                part1 = int(numberString[:mid])
+                part2 = int(numberString[mid:])
+                arr[i] = part1
+                arr.insert(i + 1, part2)
+                i += 1
+                length += 1
+            else:
+                arr[i] = arr[i] * 2024
+            i += 1
+    return arr
+
+
+puzzleInput = [28591, 78, 0, 3159881, 4254, 524155, 598, 1]
+pebble(puzzleInput, 25)
