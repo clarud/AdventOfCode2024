@@ -1,0 +1,45 @@
+def pebble(arr, time):
+    memo = {}
+    def helper(num, i):
+        if i == 0:
+            return 1
+        if (num, i) in memo:
+            return memo[(num, i)]
+        
+        count = 0
+        array = transform(num)
+        for element in array:
+            count += helper(element, i - 1)
+        memo[(num, i)] = count
+        return count
+    count = 0
+    for num in arr:
+        count += helper(num, time)
+    return count
+
+
+def transform(num):
+    if num == 0:
+        result = [1]
+    elif len(str(num)) % 2 == 0:
+        numberString = str(num)
+        mid = len(numberString) // 2
+        part1 = int(numberString[:mid])
+        part2 = int(numberString[mid:])
+        result = [part1, part2]
+    else:
+        result = [num * 2024]
+    return result
+
+
+
+
+def countStones(arr):
+    count =  len(arr)
+    return count
+
+puzzleInput = [28591, 78, 0, 3159881, 4254, 524155, 598, 1]
+test = [125, 17]
+output = pebble(puzzleInput, 75)
+
+print(output)
