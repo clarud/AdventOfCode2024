@@ -22,12 +22,55 @@ def findGuard(arr):
 
 
 def guardMove(guardPos, arr, direction):
+    startPos = guardPos
+    newObstacleCount = 0
     # while guard is within map, guard is valid to move
     while (guardPos[0] < len(arr[0]) and guardPos[0] >= 0) and (guardPos[1] < len(arr) and guardPos[1] >= 0):
+        arr[startPos[1]][startPos[0]] = '+' 
         currentPos = guardPos
         # mark current position
         currentX = currentPos[0] 
         currentY = currentPos[1]
+        if arr[currentY][currentX] == '.':
+            new = True
+        else:
+            new = False
+
+        # Check if at current position there is a junction on its right path
+        xmin = 0
+        xmax = len(arr[0]) - 1
+        ymin = 0
+        ymax = len(arr) - 1
+        altx = currentX
+        alty = currentY
+        # up
+        if direction == 0:
+            while altx <= xmax:
+                if arr[alty][altx] == '+':
+                    newObstacleCount += 1
+                    break
+                altx += 1
+        # down
+        elif direction == 2:
+            while altx <= xmin:
+                if arr[alty][altx] == '+':
+                    newObstacleCount += 1
+                    break
+                altx -= 1
+        # left
+        elif direction == 3:
+            while alty >= ymin:
+                if arr[alty][altx] == '+':
+                    newObstacleCount += 1
+                    break
+                alty -= 1
+        # right
+        elif direction == 1:
+            while alty <= ymax:
+                if arr[alty][altx] == '+':
+                    newObstacleCount += 1
+                    break
+                alty += 1
 
         # next position
         nextx = guardPos[0]
@@ -50,18 +93,28 @@ def guardMove(guardPos, arr, direction):
             arr[currentY][currentX] = '-'
             nextPos = (nextx + 1, nexty)
 
+        if new == False:
+            arr[currentY][currentX] = '+'
+
         if not((nextPos[0] < len(arr[0]) and nextPos[0] >= 0) and (nextPos[1] < len(arr) and nextPos[1] >= 0)):
             break  
 
         if arr[nextPos[1]][nextPos[0]] == '#':
             arr[currentY][currentX] = '+'
-            if direction == 3:
+            if direction == 0:
+                nextPos = (nextx + 1, nexty)
+                direction = 1
+            elif direction == 1:
+                nextPos = (nextx, nexty + 1)
+                direction = 2
+            elif direction == 2:
+                nextPos = (nextx - 1, nexty)
+                direction = 3
+            elif direction == 3:
+                nextPos = (nextx, nexty - 1)
                 direction = 0
-            else:
-                direction += 1
-        else:
-            guardPos = nextPos                                                       
-    return arr
+        guardPos = nextPos                                                      
+    return newObstacleCount
 
 def countPath(arr):
     count = 0
@@ -221,5 +274,4 @@ puzzleInput = '''...#....#................................#.....................
 .....#...#...............#......................#........#..........#..##...#...#........#..........#.............................
 #...........#.............#...............................#..............................#...#.#........#.........................'''
 
-print2d(guardMove(findGuard(parseInput(test)), parseInput(test), 0))
-print(countPath(guardMove(findGuard(parseInput(test)), parseInput(test), 0)))
+print(guardMove(findGuard(parseInput(puzzleInput)), parseInput(puzzleInput), 0))
