@@ -21,12 +21,13 @@ def findGuard(arr):
     return guardPos
 
 
-def guardMove(guardPos, arr, direction):
-    startPos = guardPos
+def guardMove(guardPos, arr, direction, barrier):
     newObstacleCount = 0
+    loopCheck = 0
+    if loopCheck > 10:
+        return 1
     # while guard is within map, guard is valid to move
     while (guardPos[0] < len(arr[0]) and guardPos[0] >= 0) and (guardPos[1] < len(arr) and guardPos[1] >= 0):
-        arr[startPos[1]][startPos[0]] = '+' 
         currentPos = guardPos
         # mark current position
         currentX = currentPos[0] 
@@ -35,42 +36,7 @@ def guardMove(guardPos, arr, direction):
             new = True
         else:
             new = False
-
-        # Check if at current position there is a junction on its right path
-        xmin = 0
-        xmax = len(arr[0]) - 1
-        ymin = 0
-        ymax = len(arr) - 1
-        altx = currentX
-        alty = currentY
-        # up
-        if direction == 0:
-            while altx <= xmax:
-                if arr[alty][altx] == '+':
-                    newObstacleCount += 1
-                    break
-                altx += 1
-        # down
-        elif direction == 2:
-            while altx <= xmin:
-                if arr[alty][altx] == '+':
-                    newObstacleCount += 1
-                    break
-                altx -= 1
-        # left
-        elif direction == 3:
-            while alty >= ymin:
-                if arr[alty][altx] == '+':
-                    newObstacleCount += 1
-                    break
-                alty -= 1
-        # right
-        elif direction == 1:
-            while alty <= ymax:
-                if arr[alty][altx] == '+':
-                    newObstacleCount += 1
-                    break
-                alty += 1
+            loopCheck += 1
 
         # next position
         nextx = guardPos[0]
@@ -93,13 +59,37 @@ def guardMove(guardPos, arr, direction):
             arr[currentY][currentX] = '-'
             nextPos = (nextx + 1, nexty)
 
+        invalidRoute = 0
+        if barrier == 1:
+            tempNext = arr[nexty][nextx]
+            arr[nexty][nextx] = 'O'
+            # alternate position
+            altx = guardPos[0]
+            alty = guardPos[1]
+            altPos = guardPos
+            if direction == 0:
+                altPos = (altx + 1, alty)
+                altdirection = 1
+            elif direction == 1:
+                altPos = (altx, alty + 1)
+                altdirection = 2
+            elif direction == 2:
+                altPos = (altx - 1, alty)   
+                altdirection = 3
+            elif direction == 3:
+                altPos = (altx, alty - 1)
+                altdirection = 0
+            arr[guardPos[1]][guardPos[0]] = '+'
+            invalidRoute = guardMove(altPos, arr, altdirection, barrier - 1)
+
+
         if new == False:
             arr[currentY][currentX] = '+'
 
         if not((nextPos[0] < len(arr[0]) and nextPos[0] >= 0) and (nextPos[1] < len(arr) and nextPos[1] >= 0)):
             break  
 
-        if arr[nextPos[1]][nextPos[0]] == '#':
+        if arr[nextPos[1]][nextPos[0]] == '#' or arr[nextPos[1]][nextPos[0]] == 'O':
             arr[currentY][currentX] = '+'
             if direction == 0:
                 nextPos = (nextx + 1, nexty)
@@ -113,8 +103,8 @@ def guardMove(guardPos, arr, direction):
             elif direction == 3:
                 nextPos = (nextx, nexty - 1)
                 direction = 0
-        guardPos = nextPos                                                      
-    return newObstacleCount
+        guardPos = nextPos                                                   
+    return newObstacleCount + invalidRoute
 
 def countPath(arr):
     count = 0
@@ -274,4 +264,5 @@ puzzleInput = '''...#....#................................#.....................
 .....#...#...............#......................#........#..........#..##...#...#........#..........#.............................
 #...........#.............#...............................#..............................#...#.#........#.........................'''
 
-print(guardMove(findGuard(parseInput(puzzleInput)), parseInput(puzzleInput), 0))
+currentInput = test
+print(guardMove(findGuard(parseInput(currentInput)), parseInput(currentInput), 0, 1))
