@@ -1485,7 +1485,7 @@ def correctSequence(input):
                         if rule in currentSeq and currentSeq.index(rule) > j:
                             pos = currentSeq.index(rule)
                             temp = currentSeq.pop(j)
-                            currentSeq.insert(pos + 1, temp)
+                            currentSeq.insert(pos, temp)
                             fixed = False
                             break
         print(currentSeq)
